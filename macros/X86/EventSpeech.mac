@@ -1,0 +1,175 @@
+// EventSpeech, Copyright(C ) Misono
+
+loaddll currentmacrodirectory + "\\misoSpeech.dll";
+
+// スクリーンリーダー判定
+// 1 = PC-Talker  2 = FocusTalk
+// 3 = 95Reader  4 = NVDA
+// 5 = 秀丸リーダー
+#sr = dllfuncw("IsScreenReaderRunning");
+
+	if ( #sr == 0 ) {
+		beep;
+		endmacro;
+	}
+
+	if ( iskeydown(0x23) | iskeydown(0x24) )
+	{ // Home/End
+		goto LineSpeechProcess;
+	}
+
+	else if ( iskeydown(0x26) | iskeydown(0x28) )
+	{  //上下
+		goto LineSpeechProcess;
+	}
+
+	else if ( iskeydown(0x25) | iskeydown(0x27) )
+	{  //左右
+		goto CharSpeechProcess;
+	}
+
+	else if ( iskeydown(0x2e) )
+	{  // Del
+		play currentmacrodirectory + "\\beepms.wav";
+		goto CharSpeechProcess;
+	}
+
+	else if ( iskeydown(0x11) & iskeydown(0x44) )
+	{  // Ctrl + D
+		play currentmacrodirectory + "\\beepms.wav";
+		goto CharSpeechProcess;
+	}
+
+	else if ( iskeydown(0x08) )
+	{  // BackSpace
+		if ( event == 5 )
+			endmacro;
+		play currentmacrodirectory + "\\beepms.wav";
+		goto CharSpeechProcess;
+	}
+
+	else if ( iskeydown(0x11) & iskeydown(0x48) )
+	{  // Ctrl + H
+		if ( event == 5 )
+			endmacro;
+		play currentmacrodirectory + "\\beepms.wav";
+		goto CharSpeechProcess;
+	}
+
+	else if ( iskeydown(0x10) )
+	{  //シフト
+	if ( !selecting )
+		endmacro;
+		#ym = 0;
+		$str = gettext(seltopx, seltopy, selendx, selendy, 1);
+		goto SpeechProcess;
+	}
+
+	else
+	{
+		if ( event == 5 )
+			endmacro;
+		#cmd = geteventparam(4);
+		if ( #cmd == 20 )
+			goto LineSpeechProcess;
+		else if ( #cmd == 34 )
+			goto LineSpeechProcess;
+		else if ( #cmd == 376 || #cmd == 377 )
+			goto LineSpeechProcess;
+		endmacro;
+	}
+
+LineSpeechProcess:
+
+	if( y == -1 )
+		$str = "ほんぶん";
+	else if( linelen == 0 )
+	{
+		play currentmacrodirectory + "\\KSDMbSp.wav";
+//		$str = "クーギョー";
+	}
+	else
+		$str = gettext(0, y, linelen, y, 1 );
+	#ym = 0;
+		goto SpeechProcess;
+
+CharSpeechProcess:
+
+	#code = unicode;
+	if ( y == linecount - 1 && x > linelen )
+		#code = 0;
+	if( #code == 0 ) {
+		#ym = 0;
+		$str = "ブランク";
+	}
+	else if( #code == eof ) {
+		#ym = 0;
+		$str = "End";
+	}
+	else if( #code == 9 ) {
+		#ym = 0;
+	$str = "タブ";
+	}
+	else if( #code == 13 ) {
+		#ym = 0;
+	$str = "カイギョー";
+	}
+	else if( #code == 32 && #sr == 4 ) {
+		#ym = 1;
+		play currentmacrodirectory + "\\KSDSbSp.wav";
+		endmacro;
+	}
+	else if( #code == 12288 && #sr == 4 ) {
+		#ym = 1;
+		play currentmacrodirectory + "\\KSDMbSp.wav";
+		endmacro;
+	}
+	else {
+		#ym = 1;
+		$str = unichar(#code);
+	}
+	goto SpeechProcess;
+
+SpeechProcess:
+
+	if ( #sr == 1 ) {
+		#ss = dllfunc("PCTalkerPitchStatus");
+		if ( 8 != charset ) {
+			if ( #ym == 0 )
+				#n = dllfuncw("PCTalkerSpeechAndPitchW", $str, 5, #ss);
+			else if ( #ym == 1 )
+			#n = dllfuncw("PCTalkerGuideW", $str);
+		}
+		else {
+			if ( #ym == 0 )
+				#n = dllfunc("PCTalkerSpeechAndPitchA", $str, 5, #ss);
+			else if ( #ym == 1 )
+			#n = dllfunc("PCTalkerGuideA", $str);
+		}
+	}
+	else if ( #sr == 2 ) {
+		#ss = dllfunc("FocusTalkPitchStatus");
+		if ( #ym == 0 )
+			#n = dllfunc("FocusTalkSpeechAndPitch", $str, #ss, 1, true);
+		else if ( #ym == 1 )
+			#n = dllfunc("FocusTalkSpeechAndPitch", $str, #ss, 4, true);
+	}
+	else if ( #sr == 3 ) {
+		#ss = 0;
+		if ( #ym == 0 )
+		#n = dllfunc("R95SpeechAndPitch", $str, 0, #ss);
+		else if ( #ym == 1 )
+		#n = dllfunc("R95SpeechAndPitch", $str, 4, #ss);
+	}
+	else if ( #sr == 4 ) {
+		if ( #ym == 0 )
+			#n = dllfuncw("NvdaSpeechText", $str);
+		else if ( #ym == 1 )
+			#n = dllfuncw("NvdaSpeechSpelling", $str);
+	}
+	else if ( #sr == 5 ) {
+	}
+	else {
+	}
+//	freedll;
+	endmacro;
