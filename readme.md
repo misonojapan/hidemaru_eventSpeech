@@ -1,20 +1,23 @@
-# eventSpeech(�G�ۑΉ��A�h�I��)
+# eventSpeech(秀丸対応アドオン)
 
-���̃p�b�P�[�W�ɂ͈ȉ��̃t�H���_������܂�
+このパッケージには以下のフォルダがあります
 
 addon
-�A�h�I���̃\�[�X�t�@�C�����܂܂�Ă��܂�
+アドオンのソースファイルが含まれています
 
 macros
-�G�ۗp�̃}�N���t�@�C���⃉�C�u�����t�@�C�����܂܂�Ă��܂�
+秀丸用のマクロファイルやライブラリファイルが含まれています
 
 site_scons
-scons�p�̍\���p�b�P�[�W���܂܂�Ă��܂�
+scons用の構成パッケージが含まれています
 
 macros/x64
-64�r�b�g�� EventSpeech ���܂܂�Ă��܂��B�t�H���_���̂��ׂẴt�@�C�����G�ۃG�f�B�^�̃}�N���f�B���N�g���ɏ㏑�����܂��B
+64ビット版 EventSpeech が含まれています。フォルダ内のすべてのファイルを秀丸エディタのマクロディレクトリに上書きします。
 
 macros/x86
-32�r�b�g�� EventSpeech ���܂܂�Ă��܂��B�t�H���_���̂��ׂẴt�@�C�����G�ۃG�f�B�^�̃}�N���f�B���N�g���ɏ㏑�����܂��B
+32ビット版 EventSpeech が含まれています。フォルダ内のすべてのファイルを秀丸エディタのマクロディレクトリに上書きします。
 
-�ȏ�B
+pkgs
+パッケージファイルが含まれています。
+
+以上。
